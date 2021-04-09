@@ -1,0 +1,58 @@
+- 자바 디버그  2시간 입니다.
+- 생성자, 초기화 오류
+- 자바 예외 종류와 예외처리 방법
+- Overriding 오류
+- Singleton 코딩 오류
+- Serializable 코딩 오류
+- Comparable과 Comparator 코딩 오류
+- 그외 코딩 오류 처리
+
+-> 코딩하다가 교수님에게 이거 답이 안나와요 "오류잡아주세요" 하는 부분을 직접 잡는 것!!!!!!!!!!
+
+<JRE 버전자체가 없거나 안맞을 경우 코드 자체가 아니라 프로젝트 전체오류>
+프로젝트 우클릭->Properties->Configure Build Path->Libraries->Java Build Path->
+add Library->JRE System 라이브러리->-lternate JRE에서 버전 맞는지 확인->사용하는 버전 찾아 맞추기
+
+<자바 컴파일에러>
+프로젝트 우클릭->Properties->Java Complier->1.8버전으로 맞추기
+
+<버전을 다 맞췄는데도 오류가 나는 경우> Problems 창에서 오류 확인(안보이는경우 Windows->Show View->Problems)
+<어느 생성자로 올라가는지 확인하고 싶을때> 호출하는 곳에서 F3 클릭
+<자바 예외처리 종류> 사용자정의 예외처리
+NumberFormatEexception : 숫자로 바꿀 수 없음
+ArithmeticException : 0으로 나눌 수 없음
+ArrayIndexOutOfBoundsException: 입력값이 없음
+오른쪽 클릭-> Run as -> Run Configuration -> Arguments-> Variables에서 string_promt 선택하면 값 넣어서 에러 나는 경우 확인할 수 있음
+모든 오류를 다 잡고싶으면 try-catch문에 Exception
+- class 옆에서 throws, 내부에서는 throw
+
+<Comparable과 Comparator>
+- 공통정보: 오름차순이면 해당 객체를 앞에다 넣고, 내림차순이면 뒤에다 넣음
+
+- Comparator: 익명중첩클래스
+1. 점수를 오름차순
+Arrays.sort(s, new Comparator<Student>() {
+	@Override
+	public int compare(Student o1, Student o2) {
+		return o2.score - o1.score;
+	}
+}
+2. 이름으로 오름차순이면 compare 내부모습
+o1.name.compareTo(o2.name);
+3. 학점으로 내림차순, 학점이 같으면 학번으로 오름차순이면 compare 내부모습
+if (o1.score==o2.score)
+	return o1.num - o2.num;
+
+- Comparable: 해당 객체가서 implements Comparable<객체클래스이름>
+1. int형 배열일 경우 바로 Arrays.sort(arr) 가능
+2. 객체형 배열일 경우 ClassCastException 나기 때문에 Comparable을 꼭 implement
+그리고 Student 객체내에서 꼭 정의
+public int compareTo(Student o)
+	return Integer.compare(o.num, this.num);
+
+
+<주의사항>
+1. 완성된 프로젝트 압축 import(버전이 다를경우 프로젝트 자체에서 오류 발생)
+2. 실행하다보면 에러나는거나 문제에서 나오는 답이 안나올 수 있다(런타임에러)
+3. 런타임 에러가 안나는데도 실행안되는건 본인이 추가해야함
+4. import할때 환경이 안맞는경우 java버전이 안맞는 경우

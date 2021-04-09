@@ -1,0 +1,23 @@
+sql 실행 순서 및 종류
+where 조건 연산자(like(escape문자처리), between, in, is null 등)
+   - between, in==> test1.sql (ex11, ex10)
+
+함수(날짜관련, 문자 관련, 제어)
+N-top 쿼리
+group by 및 관련 함수 
+join 관련(Ansi, 종류, join 조건)
+subquery관련(종류, 연산자,
+DDL- 생성,수정,삭제, 제약 조건
+TCL(commit, rollback, savepoint)
+index
+view
+ER 모델 기본 요소 및 관계성
+Mapping rule
+정규화
+group by rollup
+group by grouping
+
+
+
+
+

@@ -1,0 +1,127 @@
+-- ---------------------------------------------------------------------------
+-- MySQL에서 소계,합산 계산하는 rollup함수
+-- [형식]
+-- SELECT A, B, sum(C) FROM TABLE GROUP BY A, B WITH ROLLUP;
+
+create table goods(
+item varchar(10),
+cost int);
+
+insert into goods(item, cost) values('pencil', 100);
+insert into goods(item, cost) values('erase', 200);
+insert into goods(item, cost) values('pencil', 150);
+insert into goods(item, cost) values('pencil', 130);
+insert into goods(item, cost) values('erase', 190);
+commit;
+select * from goods;
+
+-- 테스트1) group by
+select item, sum(cost)as "sum" 
+from goods
+group by item;
+-- [결과]
+-- item   sum
+-- -----------
+-- pencil 380
+-- erase  390
+-- -----------------------------------------
+-- 테스트2) group by ~ with rollup
+-- 방법1) 
+select item, sum(cost)as "sum" 
+from goods 
+group by item with rollup 
+
+-- 방법2) 
+select item, sum(cost)as "sum"
+from goods 
+group by rollup(item)
+
+-- [결과]
+-- item  sum
+-- erase  390
+-- pencil 380
+-- NULL   770
+-- --------------------------------------------------------------------------------
+create table stroregoods(
+store varchar(10),
+item varchar(10),
+cnt int,
+cost int);
+
+insert into stroregoods(store,item,cnt,cost) values("A Mart", "apple", 1, 100);
+insert into stroregoods(store,item,cnt,cost) values("A Mart", "orange", 1, 200);
+insert into stroregoods(store,item,cnt,cost) values("A Mart", "orange", 2, 390);
+insert into stroregoods(store,item,cnt,cost) values("B Mart", "apple", 1, 150);
+insert into stroregoods(store,item,cnt,cost) values("C Mart", "apple", 1, 130);
+insert into stroregoods(store,item,cnt,cost) values("C Mart", "apple", 2, 250);
+insert into stroregoods(store,item,cnt,cost) values("C Mart", "orange", 1, 190);
+
+-- 테스트1) group by
+select store, item, sum(cnt) as "all_cnt", sum(cost) as "all_cost" 
+from stroregoods 
+group by store, item;
+
+-- store     item    all_cnt   all_cost
+-- --------------------------------------
+-- A Mart   apple        1      100
+-- A Mart   orange       3      590
+-- B Mart   apple        1      150
+-- C Mart   apple        3      380
+-- C Mart   orange       1      190
+-- -------------------------------------------------------------
+
+-- 테스트2) rollup , grouping 
+select store, item, sum(cnt) as "all_cnt", sum(cost) as "all_cost" 
+from stroregoods 
+group by store, item 
+with rollup;
+--[결과]
+-- store     item    all_cnt   all_cost
+-- A Mart   apple        1      100
+-- A Mart   orange       3      590
+-- A Mart   NULL         4      690
+-- B Mart   apple        1      150
+-- B Mart   NULL         1      150
+-- C Mart   apple        3      380
+-- C Mart   orange       1      190
+-- C Mart   NULL         4      570
+-- NULL     NULL         9     1410
+-- -------------------------------------------------------------
+
+-- 테스트3)
+select grouping(store) as "grp_store" , store , grouping(item) as "grp_item", 
+       item , sum(cnt) as "all_cnt" , sum(cost) "as all_cost" 
+from stroregoods 
+group by store, item 
+with rollup;
+--[결과]
+-- grp_store   grp_item   item     all_cnt  as all_cost
+-- -------------------------------------------------
+--  0 A Mart     0       apple        1         100
+--  0 A Mart     0       orange       3         590
+--  0 A Mart     1       NULL         4         690
+--  0 B Mart     0       apple        1         150
+--  0 B Mart     1       NULL         1         150
+--  0 C Mart     0       apple        3         380
+--  0 C Mart     0       orange       1         190
+--  0 C Mart     1       NULL         4         570
+--  1 NULL       1       NULL         9        1410
+-- -------------------------------------------------------------
+
+-- 테스트4) grouping
+select case grouping(store) when 1 then 'total' else store end as "store", 
+       case grouping(item) when 1 then 'subtotal' else item end as "store", 
+       sum(cnt) as "all_cnt" , sum(cost) as "all_cost"
+from stroregoods 
+group by store, item 
+with rollup;
+-- store     item    all_cnt   all_cost
+-- A Mart   apple        1      100
+-- A Mart   orange       3      590
+-- A Mart   subtotal     4      690
+-- B Mart   apple        1      150
+-- B Mart   subtotal     1      150
+-- C Mart   apple        3      380
+-- C Mart   orange       1      190
+-- C Mart   subtotal     4      570
+-- total    subtota      9     1410
